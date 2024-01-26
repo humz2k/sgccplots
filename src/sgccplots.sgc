@@ -296,6 +296,40 @@ void axes(plot plt){
     plt.axes(0.5,"black");
 }
 
+void axes(plot plt, plot_arg arg0){
+    float thickness = 0.5;
+    string color = "black";
+    switch (arg0.t){
+        case ARG_THICKNESS:
+            thickness = arg0.data.f;
+            break;
+        case ARG_COLOR:
+            color = arg0.data.s;
+            break;
+        default:
+            break;
+    }
+    plt.axes(thickness,color);
+}
+
+void axes(plot plt, plot_arg_list args){
+    float thickness = 0.5;
+    string color = "black";
+    foreach(auto arg0 in args){
+        switch (arg0.t){
+            case ARG_THICKNESS:
+                thickness = arg0.data.f;
+                break;
+            case ARG_COLOR:
+                color = arg0.data.s;
+                break;
+            default:
+                break;
+        }
+    }
+    plt.axes(thickness,color);
+}
+
 template<T = float,int>{
 
     std.list<double> to_double_list(std.list<T> lst){
@@ -369,6 +403,7 @@ template<T = double, float, int>{
     void line(plot plt, std.list<T> xs, std.list<T> ys, plot_arg arg0){
         float thickness = 1;
         string color = color_cycle[(plt->color_cycle) % n_cycle];
+        plt->color_cycle++;
         switch (arg0.t){
             case ARG_THICKNESS:
                 thickness = arg0.data.f;
@@ -385,6 +420,7 @@ template<T = double, float, int>{
     void line(plot plt, std.list<T> xs, std.list<T> ys, plot_arg_list args){
         float thickness = 1;
         string color = color_cycle[(plt->color_cycle) % n_cycle];
+        plt->color_cycle++;
         foreach(auto arg0 in args){
             switch (arg0.t){
                 case ARG_THICKNESS:
@@ -416,6 +452,7 @@ template<T = double, float, int>{
     void scatter(plot plt, std.list<T> xs, std.list<T> ys, plot_arg arg0){
         float radius = 1;
         string color = color_cycle[(plt->color_cycle) % n_cycle];
+        plt->color_cycle++;
         string style = "o";
         switch (arg0.t){
             case ARG_STYLE:
@@ -436,6 +473,7 @@ template<T = double, float, int>{
     void scatter(plot plt, std.list<T> xs, std.list<T> ys, plot_arg_list args){
         float radius = 1;
         string color = color_cycle[(plt->color_cycle) % n_cycle];
+        plt->color_cycle++;
         string style = "o";
         foreach(auto arg0 in args){
             switch (arg0.t){

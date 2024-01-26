@@ -85,4 +85,8 @@ void x_axis(plot plt);
  
 void axes(plot plt);
 
+void axes(plot plt, plot_arg arg0);
+
+void axes(plot plt, plot_arg_list args);
+
 #endif

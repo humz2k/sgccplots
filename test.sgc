@@ -5,22 +5,6 @@
 #include <math.sgh>
 #include <filter_map_reduce.sgh>
 
-double min(std.list<double> x){
-    double out = x[0];
-    foreach (auto i in x){
-        if (i < out)out = i;
-    }
-    return out;
-}
-
-double max(std.list<double> x){
-    double out = x[0];
-    foreach (auto i in x){
-        if (i > out)out = i;
-    }
-    return out;
-}
-
 std.list<double> even_sample(double min, double max, int n){
     double step = (max-min)/(double)n;
     auto out = std.make_list<double>();

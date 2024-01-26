@@ -14,6 +14,8 @@ typedef struct drawer_struct* drawer;
 
 #include "plotstruct.sgh"
 
+#include "colors.sgh"
+
 string color_cycle[] = {
     "blue",
     "orange",
@@ -47,16 +49,6 @@ plot make_plot(int screenWidth, int screenHeight, double x_start, double y_start
     return out;
 }
 
-string cycle_colors(plot plt){
-    string out = color_cycle[plt->color_cycle % n_cycle];
-    plt->color_cycle++;
-    return out;
-}
-
-static inline float2 world2screen(plot plt, double x, double y){
-    return make_float2(((x - plt->x_start)/plt->dataWidth) * (double)plt->screenWidth,(1-((y - plt->y_start)/plt->dataHeight)) * (double)plt->screenHeight);
-}
-
 static inline void init_window(plot plt){
     InitWindow(plt->screenWidth,plt->screenHeight,"plot");
     SetTargetFPS(60);
@@ -66,144 +58,10 @@ static inline void close(plot plt){
     CloseWindow();
 }
 
-static inline void draw_point(plot plt, float2 pix, float radius_, Color color, string style){
-    float radius = (radius_/(plt->dataWidth)) * (float)(plt->screenWidth);
-    Vector2 point;
-    point.x = pix.x;
-    point.y = pix.y;
-    if (style == "o"){
-        DrawCircleV(point,radius,color);
-        return;
-    }
-    if (style == "."){
-        DrawPixel(point.x,point.y,color);
-        return;
-    }
-    
-}
-
-static inline void draw_points(plot plt, std.list<double> x, std.list<double> y, float radius, Color color, string style){
-    assert(len(x) == len(y));
-    for (int i = 0; i < len(x); i++){
-        plt.draw_point(plt.world2screen(x[i],y[i]),radius,color,style);
-    }
-}
-
-static inline void draw_line_segment(plot plt, float2 start_, float2 end_, float thickness_, Color color){
-    float thickness = (thickness_/(plt->dataWidth)) * (float)(plt->screenWidth);
-    Vector2 start;
-    start.x = start_.x;
-    start.y = start_.y;
-    Vector2 end;
-    end.x = end_.x;
-    end.y = end_.y;
-    DrawLineEx(start,end,thickness,color);
-}
-
-static inline void draw_line(plot plt, std.list<double> x, std.list<double> y, float thickness, Color color){
-    assert(len(x) == len(y));
-    for (int i = 0; i < len(x)-1; i++){
-        plt.draw_line_segment(plt.world2screen(x[i],y[i]),plt.world2screen(x[i+1],y[i+1]),thickness,color);
-    }
-}
-
-static inline void draw_y_axis(plot plt, float thickness, Color color){
-    float2 zero = plt.world2screen(0,0);
-    float2 start = make_float2(zero.x,0);
-    float2 end = make_float2(zero.x,plt->screenHeight);
-    plt.draw_line_segment(start,end,thickness,color);
-}
-
-static inline void draw_x_axis(plot plt, float thickness, Color color){
-    float2 zero = plt.world2screen(0,0);
-    float2 start = make_float2(0,zero.y);
-    float2 end = make_float2(plt->screenWidth,zero.y);
-    plt.draw_line_segment(start,end,thickness,color);
-}
-
-/*static inline drawer make_line_drawer(std.list<double> xs, std.list<double> ys, float thickness, Color color){
-    struct line_drawer_struct ldraw;
-    ldraw.xs = xs;
-    ldraw.ys = ys;
-    ldraw.thickness = thickness;
-    ldraw.color = color;
-    drawer out = (drawer)GC_malloc(sizeof(struct drawer_struct));
-    out->t = LINE_DRAWER;
-    out->drawers.line_drawer = ldraw;
-    return out;
-}
-
-static inline drawer make_scatter_drawer(std.list<double> xs, std.list<double> ys, float radius, Color color, string style){
-    struct scatter_drawer_struct ldraw;
-    ldraw.xs = xs;
-    ldraw.ys = ys;
-    ldraw.radius = radius;
-    ldraw.color = color;
-    ldraw.style = style;
-    drawer out = (drawer)GC_malloc(sizeof(struct drawer_struct));
-    out->t = SCATTER_DRAWER;
-    out->drawers.scatter_drawer = ldraw;
-    return out;
-}
-
-static inline drawer make_x_axis_drawer(float thickness, Color color){
-    struct x_axis_drawer_struct ldraw;
-    ldraw.thickness = thickness;
-    ldraw.color = color;
-    drawer out = (drawer)GC_malloc(sizeof(struct drawer_struct));
-    out->t = X_AXIS_DRAWER;
-    out->drawers.x_axis_drawer = ldraw;
-    return out;
-}
-
-static inline drawer make_y_axis_drawer(float thickness, Color color){
-    struct y_axis_drawer_struct ldraw;
-    ldraw.thickness = thickness;
-    ldraw.color = color;
-    drawer out = (drawer)GC_malloc(sizeof(struct drawer_struct));
-    out->t = Y_AXIS_DRAWER;
-    out->drawers.y_axis_drawer = ldraw;
-    return out;
-}*/
-
-static inline void draw_elem(plot plt, drawer d){
-    switch (d->t){
-        case LINE_DRAWER:
-            plt.draw_line(d->drawers.line_drawer.xs,d->drawers.line_drawer.ys,d->drawers.line_drawer.thickness,d->drawers.line_drawer.color);
-            break;
-        case SCATTER_DRAWER:
-            plt.draw_points(d->drawers.scatter_drawer.xs,d->drawers.scatter_drawer.ys,d->drawers.scatter_drawer.radius,d->drawers.scatter_drawer.color,d->drawers.scatter_drawer.style);
-            break;
-        case X_AXIS_DRAWER:
-            plt.draw_x_axis(d->drawers.x_axis_drawer.thickness,d->drawers.x_axis_drawer.color);
-            break;
-        case Y_AXIS_DRAWER:
-            plt.draw_y_axis(d->drawers.y_axis_drawer.thickness,d->drawers.y_axis_drawer.color);
-            break;
-        default:
-            break;
-    }
-}
-
 static inline void draw_all(plot plt){
     foreach (auto i in plt->drawers){
         plt.draw_elem(i);
     }
-}
-
-static inline Color string2color(string col){
-    if (col == "lightgray")return LIGHTGRAY;
-    if (col == "gray")return GRAY;
-    if (col == "darkgray")return DARKGRAY;
-    if (col == "blue")return BLUE;
-    if (col == "red")return RED;
-    if (col == "orange")return ORANGE;
-    if (col == "green")return GREEN;
-    if (col == "purple")return PURPLE;
-    if (col == "skyblue")return SKYBLUE;
-    if (col == "brown")return BROWN;
-    if (col == "black")return BLACK;
-    return BLACK;
 }
 
 void line(plot plt, std.list<double> xs, std.list<double> ys, float thickness, string color){

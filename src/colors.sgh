@@ -1,0 +1,15 @@
+#ifndef _COLORS_SGH_
+#define _COLORS_SGH_
+
+#include <string.sgh>
+
+#include "../include/raylib.sgh"
+
+struct plot_struct;
+typedef struct plot_struct* plot;
+
+Color string2color(string col);
+
+string cycle_colors(plot plt);
+
+#endif

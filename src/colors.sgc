@@ -1,0 +1,50 @@
+#include <stdlib.sgh>
+#include "../include/raylib.sgh"
+
+struct drawer_struct;
+typedef struct drawer_struct* drawer;
+
+#include <filter_map_reduce.sgh>
+#include <assert.sgh>
+#include <string.sgh>
+
+#include "../include/sgccplots.sgh"
+
+#include "drawers.sgh"
+
+#include "plotstruct.sgh"
+
+#include "colors.sgh"
+
+static string color_cycle[] = {
+    "blue",
+    "orange",
+    "green",
+    "purple",
+    "skyblue",
+    "red",
+    "brown"
+};
+
+static int n_cycle = 7;
+
+Color string2color(string col){
+    if (col == "lightgray")return LIGHTGRAY;
+    if (col == "gray")return GRAY;
+    if (col == "darkgray")return DARKGRAY;
+    if (col == "blue")return BLUE;
+    if (col == "red")return RED;
+    if (col == "orange")return ORANGE;
+    if (col == "green")return GREEN;
+    if (col == "purple")return PURPLE;
+    if (col == "skyblue")return SKYBLUE;
+    if (col == "brown")return BROWN;
+    if (col == "black")return BLACK;
+    return BLACK;
+}
+
+string cycle_colors(plot plt){
+    string out = color_cycle[plt->color_cycle % n_cycle];
+    plt->color_cycle++;
+    return out;
+}

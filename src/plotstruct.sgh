@@ -1,6 +1,9 @@
 #ifndef _PLOTSTRUCT_SGH_
 #define _PLOTSTRUCT_SGH_
 
+struct drawer_struct;
+typedef struct drawer_struct* drawer;
+
 struct plot_struct{
     int screenWidth;
     int screenHeight;

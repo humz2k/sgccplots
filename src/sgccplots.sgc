@@ -10,6 +10,10 @@ typedef struct drawer_struct* drawer;
 
 #include "../include/sgccplots.sgh"
 
+#include "drawers.sgh"
+
+#include "plotstruct.sgh"
+
 string color_cycle[] = {
     "blue",
     "orange",
@@ -21,17 +25,6 @@ string color_cycle[] = {
 };
 
 int n_cycle = 7;
-
-struct plot_struct{
-    int screenWidth;
-    int screenHeight;
-    double x_start;
-    double y_start;
-    double dataWidth;
-    double dataHeight;
-    std.list<drawer> drawers;
-    int color_cycle;
-};
 
 typedef struct plot_struct* plot;
 
@@ -51,6 +44,12 @@ plot make_plot(int screenWidth, int screenHeight, double x_start, double y_start
     out->dataHeight += pad_height*2;
     out->drawers = std.make_list<drawer>();
     out->color_cycle = 0;
+    return out;
+}
+
+string cycle_colors(plot plt){
+    string out = color_cycle[plt->color_cycle % n_cycle];
+    plt->color_cycle++;
     return out;
 }
 
@@ -122,49 +121,7 @@ static inline void draw_x_axis(plot plt, float thickness, Color color){
     plt.draw_line_segment(start,end,thickness,color);
 }
 
-struct line_drawer_struct{
-    std.list<double> xs;
-    std.list<double> ys;
-    float thickness;
-    Color color;
-};
-
-struct scatter_drawer_struct{
-    std.list<double> xs;
-    std.list<double> ys;
-    float radius;
-    Color color;
-    string style;
-};
-
-struct x_axis_drawer_struct{
-    float thickness;
-    Color color;
-};
-
-struct y_axis_drawer_struct{
-    float thickness;
-    Color color;
-};
-
-enum drawer_t{
-    LINE_DRAWER,
-    SCATTER_DRAWER,
-    X_AXIS_DRAWER,
-    Y_AXIS_DRAWER
-};
-
-struct drawer_struct{
-    enum drawer_t t;
-    union { 
-        struct line_drawer_struct line_drawer;
-        struct scatter_drawer_struct scatter_drawer;
-        struct x_axis_drawer_struct x_axis_drawer;
-        struct y_axis_drawer_struct y_axis_drawer;
-    } drawers;
-};
-
-static inline drawer make_line_drawer(std.list<double> xs, std.list<double> ys, float thickness, Color color){
+/*static inline drawer make_line_drawer(std.list<double> xs, std.list<double> ys, float thickness, Color color){
     struct line_drawer_struct ldraw;
     ldraw.xs = xs;
     ldraw.ys = ys;
@@ -207,7 +164,7 @@ static inline drawer make_y_axis_drawer(float thickness, Color color){
     out->t = Y_AXIS_DRAWER;
     out->drawers.y_axis_drawer = ldraw;
     return out;
-}
+}*/
 
 static inline void draw_elem(plot plt, drawer d){
     switch (d->t){
@@ -392,8 +349,7 @@ plot_arg_list __add__(plot_arg_list a, plot_arg b){
 template<T = double, float, int>{
 
     void line(plot plt, std.list<T> xs, std.list<T> ys, float thickness){
-        line(plt,xs,ys,thickness,color_cycle[(plt->color_cycle) % n_cycle]);
-        plt->color_cycle++;
+        line(plt,xs,ys,thickness,plt.cycle_colors());
     }
 
     void line(plot plt, std.list<T> xs, std.list<T> ys){
@@ -402,8 +358,7 @@ template<T = double, float, int>{
 
     void line(plot plt, std.list<T> xs, std.list<T> ys, plot_arg arg0){
         float thickness = 1;
-        string color = color_cycle[(plt->color_cycle) % n_cycle];
-        plt->color_cycle++;
+        string color = "none";
         switch (arg0.t){
             case ARG_THICKNESS:
                 thickness = arg0.data.f;
@@ -414,13 +369,15 @@ template<T = double, float, int>{
             default:
                 break;
         }
+        if (color == "none"){
+            color = plt.cycle_colors();
+        }
         line(plt,xs,ys,thickness,color);
     }
 
     void line(plot plt, std.list<T> xs, std.list<T> ys, plot_arg_list args){
         float thickness = 1;
-        string color = color_cycle[(plt->color_cycle) % n_cycle];
-        plt->color_cycle++;
+        string color = "none";
         foreach(auto arg0 in args){
             switch (arg0.t){
                 case ARG_THICKNESS:
@@ -433,11 +390,14 @@ template<T = double, float, int>{
                     break;
             }
         }
+        if (color == "none"){
+            color = plt.cycle_colors();
+        }
         line(plt,xs,ys,thickness,color);
     }
 
     void scatter(plot plt, std.list<T> xs, std.list<T> ys, string style, float radius){
-        scatter(plt,xs,ys,style,radius,color_cycle[(plt->color_cycle) % n_cycle]);
+        scatter(plt,xs,ys,style,radius,plt.cycle_colors());
         plt->color_cycle++;
     }
 
@@ -451,8 +411,7 @@ template<T = double, float, int>{
 
     void scatter(plot plt, std.list<T> xs, std.list<T> ys, plot_arg arg0){
         float radius = 1;
-        string color = color_cycle[(plt->color_cycle) % n_cycle];
-        plt->color_cycle++;
+        string color = "none";
         string style = "o";
         switch (arg0.t){
             case ARG_STYLE:
@@ -467,13 +426,15 @@ template<T = double, float, int>{
             default:
                 break;
         }
+        if (color == "none"){
+            plt.cycle_colors();
+        }
         scatter(plt,xs,ys,style,radius,color);
     }
 
     void scatter(plot plt, std.list<T> xs, std.list<T> ys, plot_arg_list args){
         float radius = 1;
-        string color = color_cycle[(plt->color_cycle) % n_cycle];
-        plt->color_cycle++;
+        string color = "none";
         string style = "o";
         foreach(auto arg0 in args){
             switch (arg0.t){
@@ -489,6 +450,9 @@ template<T = double, float, int>{
                 default:
                     break;
             }
+        }
+        if (color == "none"){
+            color = plt.cycle_colors();
         }
         scatter(plt,xs,ys,style,radius,color);
     }

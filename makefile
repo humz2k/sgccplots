@@ -1,16 +1,22 @@
+SOURCEDIR ?= src
+BUILD_DIR ?= build
+
+SOURCES := $(shell find $(SOURCEDIR) -name '*.sgc')
+OBJECTS := $(SOURCES:src/%.sgc=build/%.o)
+
 RAY_MACOS_FLAGS ?= -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL
 
 driver: test.sgc lib/libsgccplots.a
 	sgcc $^ -o $@ --echo $(RAY_MACOS_FLAGS)
 
-lib/%.o: src/%.sgc
-	mkdir -p lib
+build/%.o: src/%.sgc
+	mkdir -p build
 	sgcc -c $^ -o $@
 
-lib/libsgccplots.a: lib/sgccplots.o RAYLIB
+lib/libsgccplots.a: $(OBJECTS) | RAYLIB
 	mkdir -p lib
 	ar x ext/raylib/src/libraylib.a
-	ar cr $@ $< *.o
+	ar cr $@ $^ *.o
 	rm *.o
 	rm __*
 
@@ -22,3 +28,4 @@ RAYLIB:
 clean:
 	rm -rf lib
 	rm driver
+	rm -rf build

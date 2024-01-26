@@ -1,0 +1,60 @@
+#include <stdlib.sgh>
+#include "../include/raylib.sgh"
+
+struct drawer_struct;
+typedef struct drawer_struct* drawer;
+
+#include <filter_map_reduce.sgh>
+#include <assert.sgh>
+#include <string.sgh>
+
+#include "../include/sgccplots.sgh"
+
+#include "drawers.sgh"
+
+#include "plotstruct.sgh"
+
+drawer make_line_drawer(std.list<double> xs, std.list<double> ys, float thickness, Color color){
+    struct line_drawer_struct ldraw;
+    ldraw.xs = xs;
+    ldraw.ys = ys;
+    ldraw.thickness = thickness;
+    ldraw.color = color;
+    drawer out = (drawer)GC_malloc(sizeof(struct drawer_struct));
+    out->t = LINE_DRAWER;
+    out->drawers.line_drawer = ldraw;
+    return out;
+}
+
+drawer make_scatter_drawer(std.list<double> xs, std.list<double> ys, float radius, Color color, string style){
+    struct scatter_drawer_struct ldraw;
+    ldraw.xs = xs;
+    ldraw.ys = ys;
+    ldraw.radius = radius;
+    ldraw.color = color;
+    ldraw.style = style;
+    drawer out = (drawer)GC_malloc(sizeof(struct drawer_struct));
+    out->t = SCATTER_DRAWER;
+    out->drawers.scatter_drawer = ldraw;
+    return out;
+}
+
+drawer make_x_axis_drawer(float thickness, Color color){
+    struct x_axis_drawer_struct ldraw;
+    ldraw.thickness = thickness;
+    ldraw.color = color;
+    drawer out = (drawer)GC_malloc(sizeof(struct drawer_struct));
+    out->t = X_AXIS_DRAWER;
+    out->drawers.x_axis_drawer = ldraw;
+    return out;
+}
+
+drawer make_y_axis_drawer(float thickness, Color color){
+    struct y_axis_drawer_struct ldraw;
+    ldraw.thickness = thickness;
+    ldraw.color = color;
+    drawer out = (drawer)GC_malloc(sizeof(struct drawer_struct));
+    out->t = Y_AXIS_DRAWER;
+    out->drawers.y_axis_drawer = ldraw;
+    return out;
+}

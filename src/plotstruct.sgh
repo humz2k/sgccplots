@@ -1,0 +1,15 @@
+#ifndef _PLOTSTRUCT_SGH_
+#define _PLOTSTRUCT_SGH_
+
+struct plot_struct{
+    int screenWidth;
+    int screenHeight;
+    double x_start;
+    double y_start;
+    double dataWidth;
+    double dataHeight;
+    std.list<drawer> drawers;
+    int color_cycle;
+};
+
+#endif

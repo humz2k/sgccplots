@@ -10,6 +10,7 @@ Example:
 #include <range.sgh>
 #include <math.sgh>
 #include <filter_map_reduce.sgh>
+#include <lists.sgh>
 
 std.list<double> even_sample(double min, double max, int n){
     double step = (max-min)/(double)n;
@@ -29,7 +30,6 @@ int main(){
     auto ys3 = std.map<std.list<double>,1/(sqrtf(fabs(val))+1)>(xs);
     auto ys4 = std.map<std.list<double>,(sin(val))>(xs);
 
-    //auto plt = make_plot(1000,500,min(xs),min(ys),max(xs),max(ys),50,50);
     auto plt = make_plot(500,500,-10,-10,10,10,0,0);
 
     plt.axes(gThickness(0.05));

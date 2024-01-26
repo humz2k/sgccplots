@@ -1,0 +1,44 @@
+#include <stdlib.sgh>
+#include <assert.sgh>
+#include "include/sgccplots.sgh"
+#include <range.sgh>
+#include <filter_map_reduce.sgh>
+
+double min(std.list<double> x){
+    double out = x[0];
+    foreach (auto i in x){
+        if (i < out)out = i;
+    }
+    return out;
+}
+
+double max(std.list<double> x){
+    double out = x[0];
+    foreach (auto i in x){
+        if (i > out)out = i;
+    }
+    return out;
+}
+
+int main(){
+
+    auto xs = std.make_list<double>();
+    auto ys = std.make_list<double>();
+
+    for (int i = -50; i < 51; i+=2){
+        xs.append(i);
+        ys.append(i*i*i);
+    }
+
+    auto plt = make_plot(1000,500,min(xs),min(ys),max(xs),max(ys),50,50);
+
+    plt.axes();
+
+    plt.line(xs,ys,gThickness(0.2) + gColor("red"));
+
+    plt.scatter(xs,ys,gStyle("o") + gRadius(0.5) + gColor("red"));
+
+    plt.show();
+
+    return 0;
+}

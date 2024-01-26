@@ -1,0 +1,88 @@
+#ifndef _SGCCPLOTS_SGH_
+#define _SGCCPLOTS_SGH_
+
+#include <string.sgh>
+
+enum generic_arg_t{
+    ARG_COLOR,
+    ARG_RADIUS,
+    ARG_THICKNESS,
+    ARG_STYLE
+};
+
+typedef struct{
+    enum generic_arg_t t;
+    union {
+        float f;
+        const char* s;
+    } data;
+} plot_arg;
+
+#include <lists.sgh>
+
+typedef std.list<plot_arg> plot_arg_list;
+
+plot_arg_list __add__(plot_arg a, plot_arg b);
+
+plot_arg_list __add__(plot_arg_list a, plot_arg b);
+
+struct plot_struct;
+typedef struct plot_struct* plot;
+
+plot make_plot(int screenWidth, int screenHeight, double x_start, double y_start, double x_end, double y_end, double padx, double pady);
+
+void show(plot plt);
+
+template<T=int,double>{
+
+    void line(plot plt, std.list<T> xs, std.list<T> ys, float thickness, string color);
+
+    void line(plot plt, std.list<T> xs, std.list<T> ys, float thickness);
+
+    void line(plot plt, std.list<T> xs, std.list<T> ys);
+
+    void line(plot plt, std.list<T> xs, std.list<T> ys, plot_arg arg0);
+
+    void line(plot plt, std.list<T> xs, std.list<T> ys, plot_arg_list args);
+
+    void scatter(plot plt, std.list<T> xs, std.list<T> ys, string style, float radius, string color);
+
+    void scatter(plot plt, std.list<T> xs, std.list<T> ys, string style, float radius);
+
+    void scatter(plot plt, std.list<T> xs, std.list<T> ys, string style);
+
+    void scatter(plot plt, std.list<T> xs, std.list<T> ys);
+
+    void scatter(plot plt, std.list<T> xs, std.list<T> ys, plot_arg arg0);
+
+    void scatter(plot plt, std.list<T> xs, std.list<T> ys, plot_arg_list args);
+
+}
+
+plot_arg gColor(string color);
+
+plot_arg gRadius(float radius);
+
+plot_arg gThickness(float thickness);
+
+plot_arg gStyle(string style);
+
+void y_axis(plot plt, float radius, string color);
+
+void x_axis(plot plt, float radius, string color);
+ 
+void axes(plot plt, float radius, string color);
+
+void y_axis(plot plt, float radius);
+
+void x_axis(plot plt, float radius);
+ 
+void axes(plot plt, float radius);
+
+void y_axis(plot plt);
+
+void x_axis(plot plt);
+ 
+void axes(plot plt);
+
+#endif
